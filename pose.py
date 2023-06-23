@@ -46,8 +46,6 @@ class poseDetector():
         if angle < 0:
             angle = angle + 360
 
-        # print(angle)
-
         # Draw
         if draw:
             cv2.line(img, (x1, y1), (x2, y2), (255, 255, 255), 3)
@@ -63,7 +61,7 @@ class poseDetector():
         return angle
 
 
-def main(fileAddress):
+def main(fileAddress, showVideo, draw):
     cap = cv2.VideoCapture(fileAddress)
 
     detector = poseDetector()
@@ -77,27 +75,22 @@ def main(fileAddress):
             break
 
         img = cv2.flip(img, 1)
-        img = detector.findPose(img)
-        lmList = detector.findPosition(img, draw=False)
+        img = detector.findPose(img, draw)
+        lmList = detector.findPosition(img, draw)
 
         absList.append(lmList)
 
         # print coordinates
-        for i in range(len(lmList)):
-            print(lmList[i])
+        # for i in range(len(lmList)):
+        #     print(lmList[i])
 
-        img = cv2.flip(img, 1)
-
-        cv2.putText(img, "Dance Pose Analysis:", (70, 50), cv2.FONT_HERSHEY_PLAIN, 3,
-                    (255, 0, 0), 3)
-
-        cv2.imshow("Image", img)
+        if showVideo:
+            img = cv2.flip(img, 1)
+            cv2.putText(img, "Dance Pose Analysis:", (70, 50), cv2.FONT_HERSHEY_PLAIN, 3, (255, 0, 0), 3)
+            cv2.imshow("Image", img)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-
-        # cv2.waitKey(0)
-        # break
 
     return absList
 
@@ -112,8 +105,7 @@ def calcAngle(f, absList, n1, n2, n3):
     x1 = absList[f][n1][1]
 
     # Calculate the angle
-    angle = math.degrees(math.atan2(y3 - y2, x3 - x2) -
-                         math.atan2(y1 - y2, x1 - x2))
+    angle = math.degrees(math.atan2(y3 - y2, x3 - x2) - math.atan2(y1 - y2, x1 - x2))
 
     if angle < 0:
         angle = abs(angle)
@@ -142,10 +134,8 @@ def createAngleList(absList):
     return angleList
 
 
-def getAngleList(fileAddress):
-    absList = main(fileAddress)
-    print('Debug: Done With GetAngleList!!')
-    print('\n\n\n Printing AbsList!! --------------')
-    print(absList)
+def getAngleList(fileAddress, showVideo, draw):
+    absList = main(fileAddress, showVideo, draw)
+    # print(absList)
     return createAngleList(absList)
 

@@ -1,4 +1,5 @@
-from singlepersontracking import poseDetector
+from pose import poseDetector
+from compare import compareVideos
 from flask import Flask, render_template, Response
 import cv2
 
@@ -68,7 +69,15 @@ def save_video():
     cap.release()
     out.release()
 
-    return 'Video saved successfully!'
+    return render_template('compare.html')
+
+@app.route('/compare', methods=['POST'])
+def compare():
+    ref1 = "videos/RobotDance.mov"
+    ref2 = "videos/VenushaDance.mov"
+    danceScore, flaggedTimeStamps, percentErrorList = compareVideos(ref1, ref2)
+
+    return "Dance Score: " + str(danceScore)
 
 if __name__=="__main__":
     app.run(debug=False)
