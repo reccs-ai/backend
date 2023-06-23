@@ -1,4 +1,4 @@
-from pose import poseDetector
+from singlepersontracking import poseDetector
 from flask import Flask, render_template, Response
 import cv2
 
@@ -19,26 +19,30 @@ def generate_frames():
     out = cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc(*'mp4v'), fps, (width, height))
     # prevTime = 0
 
-    # create pose detector to paint skeleton
-    # detector = poseDetector()
+    # Create pose detector to draw the skeleton
+    detector = poseDetector()
     while cap.isOpened():
-        # read the camera frame
+        # Read the camera frame
         ret, frame = cap.read()
         if not ret:
             break
         
-        # flip the frame horizontally
+        # Flip the frame horizontally
         frame = cv2.flip(frame, 1)
 
-        # Save the frame to the video file
-        out.write(frame)
+        # Add skeleton on person
+        frame = detector.findPose(frame)
 
-        # add skeleton on person
-        # frame = detector.findPose(frame)
+        # Calculate the frame rate
         # curTime = time.time()
         # fps = 1 / (curTime - prevTime)
         # prevTime = curTime
         # cv2.putText(frame, str(int(fps)), (70, 50), cv2.FONT_HERSHEY_PLAIN, 3, (255, 0, 0), 3)
+
+        # Save the frame to the video file
+        out.write(frame)
+
+        # Save as jpg to send as a stream
         ret, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
 
