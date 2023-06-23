@@ -1,8 +1,4 @@
 import cv2
-import numpy as np
-# from time import time
-import mediapipe as mp
-import pandas as pd
 import os
 import pose as pm
 from contextlib import contextmanager
