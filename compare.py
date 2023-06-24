@@ -12,28 +12,8 @@ def compareVideos(ref1, ref2):
     list1 = getAngleList(ref1, showVideo=False, draw=False)
     list2 = getAngleList(ref2, showVideo=False, draw=False)
 
-    # print('\n\n Printing List1:   ')
-    # print(list1)
-
-    # print('\n Printing List2:   ')
-    # print(list2)
-
-    # print('Done with Step 1 in Compare.py!!')
-
-    # print('\n\n\n\n\n\n\n')
-
-    # print('Length of List1: ' + str(len(list1)))
-    # print('Length of List2: ' + str(len(list2)))
-
-
     # Step 2 - Pass through Dynamic Time Wraping (DTW) Algorithm
     _, path = fastdtw(np.array(list1), np.array(list2), dist=euclidean)
-
-    # print('\n---------Printing Path Array (Index Match Ups)---------')
-    # print(path)
-
-    # print('Length of Path: ' + str(len(path))) # this is equal to or greater than (why?) the length of the biggest list
-
 
     # Step 3 - Use Path to get aggregate Percent Error Difference per frame!
     result = compare_angle_lists(list1, list2, path)
@@ -43,15 +23,6 @@ def compareVideos(ref1, ref2):
     danceScore = abs(100 - round(result[2], 2))
 
     return danceScore, flaggedTimeStamps, percentErrorList
-
-    # print('\n\nPercentErrorList: ')
-    # print(percentErrorList)
-
-    # print('\n\nFlaggedTimeStamps: ')
-    # print(list(set(flaggedTimeStamps)))
-
-    # print('\n\nDance Score: ')
-    # print(danceScore)
 
 def main():
     compareVideos(ref1, ref2)

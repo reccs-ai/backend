@@ -2,6 +2,54 @@ import math
 import cv2
 from mediapipe import solutions
 
+jointNodeList = [
+    [13,11,23], # left shoulder
+    [15,13,11], # left elbow
+    [14,12,24], # right shoulder
+    [16,14,12], # right elbow
+    [11,23,25], # left hip
+    [23,25,27], # left knee
+    [25,27,31], # left ankle
+    [12,24,26], # right hip
+    [24,26,28], # right knee
+    [26,28,32], # right ankle
+]
+
+jointNodeMap = [
+    "nose",                 # 0
+    "left eye (inner)",     # 1
+    "left eye",             # 2
+    "left eye (outer)",     # 3
+    "right eye (inner)",    # 4
+    "right eye",            # 5
+    "right eye (outer)"     # 6
+    "left ear",             # 7
+    "right ear",            # 8
+    "mouth (left)",         # 9
+    "mouth (right)",        # 10
+    "left shoulder",        # 11
+    "right shoulder",       # 12
+    "left elbow",           # 13
+    "right elbow",          # 14
+    "left wrist",           # 15
+    "right wrist",          # 16
+    "left pinky",           # 17
+    "right pinky",          # 18
+    "left index",           # 19
+    "right index",          # 20
+    "left thumb",           # 21
+    "right thumb",          # 22
+    "left hip",             # 23
+    "right hip",            # 24
+    "left knee",            # 25
+    "right knee",           # 26
+    "left ankle",           # 27
+    "right ankle",          # 28
+    "left heel",            # 29
+    "right heel",           # 30
+    "left foot index",      # 31
+    "right foot index",     # 32
+]
 
 class poseDetector():
 
@@ -33,32 +81,32 @@ class poseDetector():
         return self.lmList
     
     # Finds angle between three different nodes
-    def findAngle(self, img, p1, p2, p3, draw=True):
+    # def findAngle(self, img, p1, p2, p3, draw=True):
 
-        # Get the landmarks
-        x1, y1 = self.lmList[p1][1:]
-        x2, y2 = self.lmList[p2][1:]
-        x3, y3 = self.lmList[p3][1:]
+    #     # Get the landmarks
+    #     x1, y1 = self.lmList[p1][1:]
+    #     x2, y2 = self.lmList[p2][1:]
+    #     x3, y3 = self.lmList[p3][1:]
 
-        # Calculate the Angle
-        angle = math.degrees(math.atan2(y3 - y2, x3 - x2) - math.atan2(y1 - y2, x1 - x2))
+    #     # Calculate the Angle
+    #     angle = math.degrees(math.atan2(y3 - y2, x3 - x2) - math.atan2(y1 - y2, x1 - x2))
 
-        if angle < 0:
-            angle = angle + 360
+    #     if angle < 0:
+    #         angle = angle + 360
 
-        # Draw
-        if draw:
-            cv2.line(img, (x1, y1), (x2, y2), (255, 255, 255), 3)
-            cv2.line(img, (x3, y3), (x2, y2), (255, 255, 255), 3)
-            cv2.circle(img, (x1, y1), 10, (0, 0, 255), cv2.FILLED)
-            cv2.circle(img, (x1, y1), 15, (0, 0, 255), 2)
-            cv2.circle(img, (x2, y2), 10, (0, 0, 255), cv2.FILLED)
-            cv2.circle(img, (x2, y2), 15, (0, 0, 255), 2)
-            cv2.circle(img, (x3, y3), 10, (0, 0, 255), cv2.FILLED)
-            cv2.circle(img, (x3, y3), 15, (0, 0, 255), 2)
-            cv2.putText(img, str(int(angle)), (x2 - 50, y2 + 50),
-                        cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255), 2)
-        return angle
+    #     # Draw
+    #     if draw:
+    #         cv2.line(img, (x1, y1), (x2, y2), (255, 255, 255), 3)
+    #         cv2.line(img, (x3, y3), (x2, y2), (255, 255, 255), 3)
+    #         cv2.circle(img, (x1, y1), 10, (0, 0, 255), cv2.FILLED)
+    #         cv2.circle(img, (x1, y1), 15, (0, 0, 255), 2)
+    #         cv2.circle(img, (x2, y2), 10, (0, 0, 255), cv2.FILLED)
+    #         cv2.circle(img, (x2, y2), 15, (0, 0, 255), 2)
+    #         cv2.circle(img, (x3, y3), 10, (0, 0, 255), cv2.FILLED)
+    #         cv2.circle(img, (x3, y3), 15, (0, 0, 255), 2)
+    #         cv2.putText(img, str(int(angle)), (x2 - 50, y2 + 50),
+    #                     cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255), 2)
+    #     return angle
 
 
 def main(fileAddress, showVideo, draw):
@@ -107,15 +155,15 @@ def calcAngle(f, absList, n1, n2, n3):
     # Calculate the angle
     angle = math.degrees(math.atan2(y3 - y2, x3 - x2) - math.atan2(y1 - y2, x1 - x2))
 
-    if angle < 0:
-        angle = abs(angle)
+    angle = abs(angle)
+    if angle > 180:
+        angle = 360 - angle
 
     return angle
 
 
 def createAngleList(absList):
-    jointNodes = [[13, 11, 23], [15, 13, 11], [14, 12, 24], [16, 14, 12], [11, 23, 25], [23, 25, 27], [25, 27, 31],
-                  [12, 24, 26], [24, 26, 28], [24, 26, 28], [26, 28, 32]]
+    global jointNodeList
 
     angleList = []
 
@@ -125,7 +173,7 @@ def createAngleList(absList):
 
         # for each frame: 
         for j in range(10):
-            a, b, c = jointNodes[j][0], jointNodes[j][1], jointNodes[j][2]
+            a, b, c = jointNodeList[j][0], jointNodeList[j][1], jointNodeList[j][2]
             angle = calcAngle(i, absList, a, b, c)
             subList.append(round(angle, 3))
 
