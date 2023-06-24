@@ -73,8 +73,10 @@ def save_video():
 
 @app.route('/compare', methods=['POST'])
 def compare():
-    ref1 = "videos/RobotDance.mov"
-    ref2 = "videos/VenushaDance.mov"
+    
+    ref1 = "landmarks/RobotDance.txt"
+    ref2 = "landmarks/StudentDance.txt"
+    
     danceScore, flaggedTimeStamps, percentErrorList = compareVideos(ref1, ref2)
 
     return "Dance Score: " + str(danceScore)

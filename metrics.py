@@ -34,7 +34,3 @@ def compare_angle_lists(coach_List, player_List, path):
     netAccuracy = netAccuracy / (len(path) * 10)
     
     return [percent_error_list, flagged_timestamps, netAccuracy]
-
-
-    
-

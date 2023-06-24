@@ -2,21 +2,22 @@ import numpy as np
 from scipy.spatial.distance import euclidean
 from fastdtw import fastdtw
 
-from pose import getAngleList
+from pose import createAngleList
 from metrics import compare_angle_lists
-ref1 = "videos/RobotDance.mov"
-ref2 = "videos/VenushaDance.mov"
 
 def compareVideos(ref1, ref2):
     # Step 1 - Get angle lists for Input A and Input B
-    list1 = getAngleList(ref1, showVideo=False, draw=False)
-    list2 = getAngleList(ref2, showVideo=False, draw=False)
+    all_angle_list1 = createAngleList(ref1)
+    all_angle_list2 = createAngleList(ref2)
+
+    all_angle_array1 = np.array(all_angle_list1)
+    all_angle_array2 = np.array(all_angle_list2)
 
     # Step 2 - Pass through Dynamic Time Wraping (DTW) Algorithm
-    _, path = fastdtw(np.array(list1), np.array(list2), dist=euclidean)
+    _, path = fastdtw(all_angle_array1, all_angle_array2, dist=euclidean)
 
     # Step 3 - Use Path to get aggregate Percent Error Difference per frame!
-    result = compare_angle_lists(list1, list2, path)
+    result = compare_angle_lists(all_angle_list1, all_angle_list2, path)
 
     percentErrorList = result[0]
     flaggedTimeStamps = result[1]
@@ -25,7 +26,12 @@ def compareVideos(ref1, ref2):
     return danceScore, flaggedTimeStamps, percentErrorList
 
 def main():
-    compareVideos(ref1, ref2)
+    ref1 = "landmarks/RobotDance.txt"
+    ref2 = "landmarks/StudentDance.txt"
+    danceScore, flaggedTimeStamps, percentErrorList = compareVideos(ref1, ref2)
+    print(danceScore)
+    print(flaggedTimeStamps)
+    print(percentErrorList)
 
 if __name__ == "__main__":
     main()

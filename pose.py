@@ -59,131 +59,161 @@ class poseDetector():
         self.mpDraw = solutions.drawing_utils
         self.mpPose = solutions.pose
         self.pose = self.mpPose.Pose(self.mode)
-
-    # Finds pose of person
-    def findPose(self, img, draw=True):
-        imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        self.results = self.pose.process(imgRGB)
-        if self.results.pose_landmarks and draw:
-            self.mpDraw.draw_landmarks(img, self.results.pose_landmarks, self.mpPose.POSE_CONNECTIONS)
-        return img
+        
     
     # Finds position of person
     def findPosition(self, img, draw=True):
         self.lmList = []
+        imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        self.results = self.pose.process(imgRGB)
+        h, w, _ = img.shape
+
         if self.results.pose_landmarks:
-            for id, lm in enumerate(self.results.pose_landmarks.landmark):
-                h, w, _ = img.shape
-                cx, cy = int(lm.x * w), int(lm.y * h)
-                self.lmList.append([id, cx, cy])
+            for i, lm in enumerate(self.results.pose_landmarks.landmark):
+                x, y = int(lm.x * w), int(lm.y * h)
+                self.lmList.append((x, y))
                 if draw:
-                    cv2.circle(img, (cx, cy), 5, (255, 0, 0), cv2.FILLED)
+                    cv2.circle(img, (x, y), 5, (255, 0, 0), cv2.FILLED)
+
         return self.lmList
-    
-    # Finds angle between three different nodes
-    # def findAngle(self, img, p1, p2, p3, draw=True):
-
-    #     # Get the landmarks
-    #     x1, y1 = self.lmList[p1][1:]
-    #     x2, y2 = self.lmList[p2][1:]
-    #     x3, y3 = self.lmList[p3][1:]
-
-    #     # Calculate the Angle
-    #     angle = math.degrees(math.atan2(y3 - y2, x3 - x2) - math.atan2(y1 - y2, x1 - x2))
-
-    #     if angle < 0:
-    #         angle = angle + 360
-
-    #     # Draw
-    #     if draw:
-    #         cv2.line(img, (x1, y1), (x2, y2), (255, 255, 255), 3)
-    #         cv2.line(img, (x3, y3), (x2, y2), (255, 255, 255), 3)
-    #         cv2.circle(img, (x1, y1), 10, (0, 0, 255), cv2.FILLED)
-    #         cv2.circle(img, (x1, y1), 15, (0, 0, 255), 2)
-    #         cv2.circle(img, (x2, y2), 10, (0, 0, 255), cv2.FILLED)
-    #         cv2.circle(img, (x2, y2), 15, (0, 0, 255), 2)
-    #         cv2.circle(img, (x3, y3), 10, (0, 0, 255), cv2.FILLED)
-    #         cv2.circle(img, (x3, y3), 15, (0, 0, 255), 2)
-    #         cv2.putText(img, str(int(angle)), (x2 - 50, y2 + 50),
-    #                     cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255), 2)
-    #     return angle
 
 
-def main(fileAddress, showVideo, draw):
-    cap = cv2.VideoCapture(fileAddress)
-
+def processVideo(filename, lm_filename):
+    # Processes the video into a file of landmarks (x, y) for a particular frame
+    cap = cv2.VideoCapture(filename)
+    lm_file = open(lm_filename, "w")
     detector = poseDetector()
+    all_landmarks_list = []
+    
+    while cap.isOpened():
+        # Read the camera frame
+        ret, frame = cap.read()
+        if not ret:
+            break
+        
+        # Flip the frame horizontally
+        frame = cv2.flip(frame, 1)
 
-    absList = []
+        # find landmark locations
+        landmark_list = detector.findPosition(frame)
 
-    while True:
+        if landmark_list:
+            landmark_str = str(landmark_list).strip('[]') + "\n"
+            lm_file.write(landmark_str)
+        else:
+            lm_file.write("None\n")
 
-        success, img = cap.read()
+        all_landmarks_list.append(landmark_list)
+
+    cap.release()
+    lm_file.close()
+
+
+def calcAngle(landmark_list, p1, p2, p3):
+
+    # Get the landmarks
+    x1, y1 = landmark_list[p1]
+    x2, y2 = landmark_list[p2]
+    x3, y3 = landmark_list[p3]
+
+    # Calculate the Acute Angle
+    angle = math.degrees(math.atan2(y3 - y2, x3 - x2) - math.atan2(y1 - y2, x1 - x2))
+    angle = abs(angle)
+    if angle > 180:
+        angle = 360 - angle
+        
+    return angle
+
+
+def createAngleList(lm_filename):
+    global jointNodeList
+
+    lm_file = open(lm_filename, "r")
+    all_landmark_list = lm_file.read().splitlines()
+
+    all_angle_list = []
+
+    # for each frame: 
+    for i in range(len(all_landmark_list)):
+        landmark_list = [tuple(int(v) for v in a.strip("()").split(", ")) for a in all_landmark_list[i].split('), (')]
+        angle_frame_list = []
+
+        # for each joint node in the frame:
+        for j in range(len(jointNodeList)):
+            n1, n2, n3 = jointNodeList[j][0], jointNodeList[j][1], jointNodeList[j][2]
+            angle = calcAngle(landmark_list, n1, n2, n3)
+            angle_frame_list.append(round(angle, 3))
+
+        all_angle_list.append(angle_frame_list)
+
+    return all_angle_list
+
+
+def showVideo(video_filename, lm_filename):
+
+    all_angle_list = createAngleList(lm_filename)
+    
+    cap = cv2.VideoCapture(video_filename)
+
+    lm_file = open(lm_filename, "r")
+    all_landmarks_list = lm_file.read().splitlines()
+
+    count = 0
+    while cap.isOpened() and count < len(all_landmarks_list):
+
+        success, frame = cap.read()
+
         if not success:
+            print('Cant read the video , Exit!')
             break
 
-        img = cv2.flip(img, 1)
-        img = detector.findPose(img, draw)
-        lmList = detector.findPosition(img, draw)
+        frame = cv2.flip(frame, 1)
 
-        absList.append(lmList)
+        angle_list = all_angle_list[count]
+        if all_landmarks_list[count] != "None":
+            landmarks_list = [tuple(int(v) for v in a.strip("()").split(", ")) for a in all_landmarks_list[count].split('), (')]
 
-        # print coordinates
-        # for i in range(len(lmList)):
-        #     print(lmList[i])
+            for i in range(len(jointNodeList)):
+                p1, p2, p3 = jointNodeList[i][0], jointNodeList[i][1], jointNodeList[i][2]
+                x1, y1 = landmarks_list[p1]
+                x2, y2 = landmarks_list[p2]
+                x3, y3 = landmarks_list[p3]
+                cv2.line(frame, (x1, y1), (x2, y2), (255, 255, 255), 3)
+                cv2.line(frame, (x3, y3), (x2, y2), (255, 255, 255), 3)
+                cv2.circle(frame, (x1, y1), 10, (0, 0, 255), cv2.FILLED)
+                cv2.circle(frame, (x1, y1), 15, (0, 0, 255), 2)
+                cv2.circle(frame, (x2, y2), 10, (0, 0, 255), cv2.FILLED)
+                cv2.circle(frame, (x2, y2), 15, (0, 0, 255), 2)
+                cv2.circle(frame, (x3, y3), 10, (0, 0, 255), cv2.FILLED)
+                cv2.circle(frame, (x3, y3), 15, (0, 0, 255), 2)
+            
+            
+                cv2.putText(frame, str(int(angle_list[i])), (x2 - 50, y2 + 50), cv2.FONT_HERSHEY_PLAIN, 2, (100, 100, 255), 2)
+                cv2.putText(frame, str(p1), (x2 + 30, y2 + 50), cv2.FONT_HERSHEY_PLAIN, 2, (100, 255, 100), 2)
 
-        if showVideo:
-            img = cv2.flip(img, 1)
-            cv2.putText(img, "Dance Pose Analysis:", (70, 50), cv2.FONT_HERSHEY_PLAIN, 3, (255, 0, 0), 3)
-            cv2.imshow("Image", img)
+            x11, y11 = landmarks_list[11]
+            x12, y12 = landmarks_list[12]
+            x23, y23 = landmarks_list[23]
+            x24, y24 = landmarks_list[24]
+
+            cv2.line(frame, (x11, y11), (x12, y12), (255, 255, 255), 3)
+            cv2.line(frame, (x23, y23), (x24, y24), (255, 255, 255), 3)
+            
+        count += 1
+
+        cv2.imshow('Instructor' , frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    return absList
-
-def calcAngle(f, absList, n1, n2, n3):
-    # Get the landmarks
-    y3 = absList[f][n3][2]
-    y2 = absList[f][n2][2]
-    y1 = absList[f][n1][2]
-
-    x3 = absList[f][n3][1]
-    x2 = absList[f][n2][1]
-    x1 = absList[f][n1][1]
-
-    # Calculate the angle
-    angle = math.degrees(math.atan2(y3 - y2, x3 - x2) - math.atan2(y1 - y2, x1 - x2))
-
-    angle = abs(angle)
-    if angle > 180:
-        angle = 360 - angle
-
-    return angle
+    cap.release()
+    lm_file.close()
+    cv2.destroyAllWindows()
 
 
-def createAngleList(absList):
-    global jointNodeList
-
-    angleList = []
-
-    for i in range(len(absList)):
-
-        subList = []
-
-        # for each frame: 
-        for j in range(10):
-            a, b, c = jointNodeList[j][0], jointNodeList[j][1], jointNodeList[j][2]
-            angle = calcAngle(i, absList, a, b, c)
-            subList.append(round(angle, 3))
-
-        angleList.append(subList)
-
-    return angleList
+def main():
+    showVideo("videos/RobotDance.mov", "RobotDance.txt")
 
 
-def getAngleList(fileAddress, showVideo, draw):
-    absList = main(fileAddress, showVideo, draw)
-    # print(absList)
-    return createAngleList(absList)
-
+if __name__ == "__main__":
+    main()
