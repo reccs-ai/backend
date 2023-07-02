@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/static/css/main.330625fc.css",
+    "main.js": "/static/js/main.0a4558b1.js",
+    "static/media/dance1.mp4": "/static/media/dance1.98aa7c912c0fd3f4624a.mp4",
+    "static/media/landingpage_icon.png": "/static/media/landingpage_icon.41b34fc13c32ee9666c1.png",
+    "static/media/Rubik-Bold.ttf": "/static/media/Rubik-Bold.62f4020377068e895a46.ttf",
+    "static/media/Rubik-Regular.ttf": "/static/media/Rubik-Regular.42535d1e2d489e27b525.ttf",
+    "static/media/Rubik-ExtraBoldItalic.ttf": "/static/media/Rubik-ExtraBoldItalic.c0a296b9952d56498396.ttf",
+    "static/media/reccslogo.svg": "/static/media/reccslogo.83131e7d3f620ba2a008d01517e7c320.svg",
+    "static/media/coffee.svg": "/static/media/coffee.66ef74f9b97a803e6c8d74a22914faf2.svg",
+    "static/media/instagram-icon.svg": "/static/media/instagram-icon.0e9085dfd6776ea2508763b3c0f775c6.svg",
+    "static/media/tiktok-icon.svg": "/static/media/tiktok-icon.75710ad148dc8019518f69fce85694ab.svg",
+    "index.html": "/index.html",
+    "main.330625fc.css.map": "/static/css/main.330625fc.css.map",
+    "main.0a4558b1.js.map": "/static/js/main.0a4558b1.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.330625fc.css",
+    "static/js/main.0a4558b1.js"
+  ]
+}
