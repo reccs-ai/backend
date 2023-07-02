@@ -1,0 +1,144 @@
+@font-face {
+  font-family: "Rubik-Bold";
+  src: url("../assets/fonts/Rubik/static/Rubik-Bold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Rubik-ExtraBoldItalic";
+  src: url("../assets/fonts/Rubik/static/Rubik-ExtraBoldItalic.ttf")
+    format("truetype");
+}
+
+@font-face {
+  font-family: "Rubik-Regular";
+  src: url("../assets/fonts/Rubik/static/Rubik-Regular.ttf") format("truetype");
+}
+
+/* hides scrollbar but allows scrolling as needed*/
+::-webkit-scrollbar {
+  display: none;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.header {
+  flex: 1;
+  padding-top: 20px;
+  padding-bottom: 30px;
+}
+
+.reccs-logo {
+  float: left;
+  height: 20px;
+  margin-top: 10px;
+}
+
+.main {
+  flex: 9;
+  display: flex; /* default direction is row */
+}
+@media (max-width: 768px) {
+  .main {
+    flex-direction: column-reverse; /* Switch to a column-reverse layout on smaller screens */
+  }
+}
+
+.main-text {
+  flex: 1;
+  padding-left: 7%;
+  padding-top: 6%;
+  justify-content: center;
+}
+@media (max-width: 768px) {
+  .main-text {
+    padding: 0%;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+.main-image {
+  flex: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing-image {
+  margin-top: 0%;
+  max-height: 150%;
+  max-width: 150%;
+}
+@media (max-width: 768px) {
+  .landing-image {
+    padding-right: 8%;
+    max-height: 100%;
+    max-width: 100%;
+    /* Switch to a column-reverse layout on smaller screens */
+  }
+}
+
+.headline {
+  font-family: "Rubik-Bold";
+  font-size: 4rem;
+  color: #1e2e4d;
+}
+@media (max-width: 768px) {
+  .headline {
+    font-size: 3rem;
+    padding-left: 0.3rem;
+    padding-right: 0.3rem;
+  }
+}
+
+.tagline {
+  font-family: "Rubik-Regular";
+  font-size: 28px;
+  color: #1e2e4d;
+}
+@media (max-width: 768px) {
+  .tagline {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+.cta {
+  padding-top: 1rem;
+}
+
+.cta-button {
+  font-family: "Rubik-Bold";
+  font-size: 1.5rem;
+  color: #ffff;
+  padding: 0.5rem;
+  padding-left: 2.5rem;
+  padding-right: 3rem;
+  background-color: #5200ff;
+  border-radius: 100px;
+  border: 0px;
+}
+.cta-button:hover {
+  cursor: pointer;
+  color: white;
+}
+
+.socials {
+  justify-content: center;
+}
+
+.ig-icon {
+  height: 100%;
+  padding: 1rem;
+}
+
+.tiktok-icon {
+  height: 100%;
+  padding: 1rem;
+}

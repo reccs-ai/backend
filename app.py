@@ -1,9 +1,12 @@
-from pose import poseDetector
-from compare import compareVideos
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, send_from_directory
+from flask_cors import CORS
 import cv2
 
-app = Flask(__name__)
+from compare import compareVideos
+from pose import poseDetector
+
+app = Flask(__name__, static_folder='frontend/build', static_url_path='')
+CORS(app)
 
 cap = None
 out = None 
@@ -32,7 +35,7 @@ def generate_frames():
         frame = cv2.flip(frame, 1)
 
         # Add skeleton on person
-        frame = detector.findPose(frame)
+        detector.findPosition(frame)
 
         # Calculate the frame rate
         # curTime = time.time()
@@ -56,6 +59,10 @@ def generate_frames():
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/hello')
+def hello():
+    return "hello"
 
 @app.route('/video')
 def video():

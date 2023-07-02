@@ -211,8 +211,39 @@ def showVideo(video_filename, lm_filename):
     cv2.destroyAllWindows()
 
 
+def skeletonVideo(video_filename, output_filename):
+    
+    cap = cv2.VideoCapture(video_filename)
+    frame_width = int(cap.get(3))
+    frame_height = int(cap.get(4))
+    
+    size = (frame_width, frame_height)
+    result = cv2.VideoWriter(output_filename, cv2.VideoWriter_fourcc(*'MP4V'), 10, size)
+    detector = poseDetector()
+    
+    while cap.isOpened():
+        # Read the camera frame
+        ret, frame = cap.read()
+        if not ret:
+            break
+        
+        # Flip the frame horizontally
+        frame = cv2.flip(frame, 1)
+
+        # find landmark locations
+        detector.findPosition(frame)
+
+        result.write(frame)
+        cv2.imshow('frame',frame)
+        
+    result.release()
+    cap.release()
+    cv2.destroyAllWindows()
+
+
 def main():
-    showVideo("videos/RobotDance.mov", "RobotDance.txt")
+    # showVideo("videos/RobotDance.mov", "RobotDance.txt")
+    skeletonVideo("videos/RobotDance.mov", "videos/res.mp4")
 
 
 if __name__ == "__main__":

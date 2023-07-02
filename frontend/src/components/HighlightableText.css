@@ -1,0 +1,12 @@
+.text-class {
+  font-family: "Rubik-ExtraBoldItalic";
+  font-size: 4rem;
+  color: #1e2e4d;
+}
+@media (max-width: 768px) {
+  .text-class {
+    font-size: 3rem;
+    padding-left: 0.3rem;
+    padding-right: 0.3rem;
+  }
+}

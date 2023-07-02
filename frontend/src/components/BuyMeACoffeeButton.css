@@ -1,0 +1,21 @@
+.coffee-icon {
+  margin-bottom: -3px;
+}
+
+.support-button {
+  margin-right: 1.7rem;
+  float: right;
+  font-family: "Rubik-Bold";
+  font-size: 1rem;
+  color: #ffff;
+  padding: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  background-color: #5200ff;
+  border-radius: 100px;
+  border: 0px;
+}
+.support-button:hover {
+  cursor: pointer;
+  color: white;
+}
