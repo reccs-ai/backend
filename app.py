@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, send_from_directory
+from flask import Flask, render_template, Response
 from flask_cors import CORS
 import cv2
 
